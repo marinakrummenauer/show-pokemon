@@ -7,23 +7,24 @@
       <div class="form-container">
         <form @submit.prevent="searchPokemon">
           <input type="text" v-model="pokemonName" placeholder="Pesquise seu Pokémon">
-          <button type="submit">Buscar</button>
+          <button class="search" type="submit">Buscar</button>
         </form>
         <div v-if="errorMessage" class="alert alert-danger" role="alert">
           {{ errorMessage }}
+          <button class="close" type="button" @click="clearErrorMessage">X</button>
         </div>
         <div class="pokemon-results">
         <ul v-if="pokemons.length">
           <li v-for="pokemon in pokemons"  v-bind:key="pokemon.id">
-            <h2>{{ pokemon.name }}</h2>
+            <h2>{{ pokemon.name.toUpperCase()  }}</h2>
             <img :src="pokemon.sprites.front_default" alt="Pokemon sprite">
-            <ul>
-              <li><strong>HP:</strong> {{ pokemon.stats[5].base_stat }}</li>
-              <li><strong>Attack:</strong> {{ pokemon.stats[4].base_stat }}</li>
-              <li><strong>Defense:</strong> {{ pokemon.stats[3].base_stat }}</li>
-              <li><strong>Special Attack:</strong> {{ pokemon.stats[2].base_stat }}</li>
-              <li><strong>Special Defense:</strong> {{ pokemon.stats[1].base_stat }}</li>
-              <li><strong>Speed:</strong> {{ pokemon.stats[0].base_stat }}</li>
+            <ul class="pokemon-info-container">
+              <li>HP: {{ pokemon.stats[5].base_stat }}</li>
+              <li>Attack: {{ pokemon.stats[4].base_stat }}</li>
+              <li>Defense: {{ pokemon.stats[3].base_stat }}</li>
+              <li>Special Attack: {{ pokemon.stats[2].base_stat }}</li>
+              <li>Special Defense: {{ pokemon.stats[1].base_stat }}</li>
+              <li>Speed: {{ pokemon.stats[0].base_stat }}</li>
             </ul>
           </li>
         </ul>
@@ -41,16 +42,22 @@
         pokemonName: "",
         pokemons: [],
         errorMessage: ""
-      };
+      }
     },
     methods: {
       async searchPokemon() {
         try {
-          const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${this.pokemonName}`);
+          const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${this.pokemonName.toLowerCase()}`);
           this.pokemons = [response.data];
         } catch (error) {
-          this.errorMessage = "Ocorreu um erro ao buscar o Pokémon";
+          this.errorMessage = "Pokémon inexistente";
         }
+      },
+      showPokemonInfo(pokemon) {
+        pokemon.showInfo = !pokemon.showInfo;
+      },
+      clearErrorMessage() {
+        this.errorMessage = "";
       }
     }
   }
@@ -63,7 +70,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 200px;
+      flex-direction: column;
     }
     .title{
       text-align: center;
@@ -72,8 +79,6 @@
     input{
       border: 2px solid #f1c204;
       border-radius:2px;
-      font-size:18px;
-      height:32px;
     }
     button{
       margin-left:8px;
@@ -88,29 +93,96 @@
       align-content: center !important;
       display: flex !important;
       right:0;
-      margin-top:32px;
     }
     .show-pokemon{
       display: block;
     }
     .pokemon-results {
       display: flex !important;
-      align-items: center;
       margin-top: 20px;
+      justify-content: center;
+        h2{
+          color:#2e63aa;
+          font-weight: 700 ;
+          justify-content: center;
+          align-items: center;
+        }
+    }
+    .pokemon-info {
+      display: none;
+    }
+    .alert-danger{
+      margin-top:24px;
+    }
+    li {
+      list-style-type: none;
+      padding:10px 20px;
+      font-weight: 400 ;
+    }
+    .pokemon-info-container {
+      border: 2px solid #f1c204;
+      padding: 10px;
+      margin-top: 10px;
+      margin-right: 20px;
     }
     @media (min-width: 320px ) and (max-width: 991px) {
       button{
         margin-left:4px;
         font-size:24px;
+        display: flex  !important;
+        margin-top:16px;
+        align-items: center;
+      }
+      .logo-pokemon {
+        width:250px;
+      }
+      .img-container{
+        margin-top:18px;
+      }
+      input{
+        display: flex;
+        font-size:18px;
+        height:32px;
+      }
+      .form-container{
+        margin-top:24px;
+      }
+      li {
+        padding-top:10px;
+        font-size:24px ;
+      }
+      .pokemon-info-container {
+        width: 280px;
       }
     }
     @media (min-width: 1024px ) {
       button{
         margin-left:8px;
-        font-size:18px;
-        width: 150px;
-        height: 32px;
+        font-size:36px;
+        width: 180px;
+        height: 56px;
       }
+      .img-container{
+        margin-top:32px;
+      }
+      .logo-pokemon {
+        width:500px;
+      }
+      .form-container{
+        margin-top:32px;
+      }
+      input{
+        font-size:28px;
+        height:46px;
+      }
+      li {
+        padding-top:10px;
+        font-size:36px ;
+      }
+      .pokemon-info-container {
+        width: 500px;
+      }
+
     }
   }
   </style>

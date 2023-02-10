@@ -1,6 +1,9 @@
 <template>
     <div class="pokemon">
-      <h1 class="title">Localize seu</h1> <img class="logo-pokemon align-center" src="@/assets/pokemon-logo.png">
+        <h1 class="title">Localize seu</h1> 
+      <span class="img-container">
+        <img class="logo-pokemon align-center" src="@/assets/pokemon-logo.png">
+      </span>
       <div class="form-container">
         <form @submit.prevent="searchPokemon">
           <input type="text" v-model="pokemonName" placeholder="Pesquise seu Pokémon">
@@ -9,6 +12,7 @@
         <div v-if="errorMessage" class="alert alert-danger" role="alert">
           {{ errorMessage }}
         </div>
+        <div class="pokemon-results">
         <ul v-if="pokemons.length">
           <li v-for="pokemon in pokemons"  v-bind:key="pokemon.id">
             <h2>{{ pokemon.name }}</h2>
@@ -23,6 +27,7 @@
             </ul>
           </li>
         </ul>
+      </div>
       </div>
     </div>
   </template>
@@ -53,6 +58,7 @@
   <style lang="scss">
 
   .pokemon{
+    padding-top:50px;
     .form-container {
       display: flex;
       justify-content: center;
@@ -61,7 +67,7 @@
     }
     .title{
       text-align: center;
-      padding-top:50px;
+      color:#2e63aa;
     }
     input{
       border: 2px solid #f1c204;
@@ -77,11 +83,20 @@
       border-radius:10px;
       font-size:24px;
     }
-    img{
+    .img-container{
       justify-content: center  !important;
       align-content: center !important;
       display: flex !important;
       right:0;
+      margin-top:32px;
+    }
+    .show-pokemon{
+      display: block;
+    }
+    .pokemon-results {
+      display: flex !important;
+      align-items: center;
+      margin-top: 20px;
     }
     @media (min-width: 320px ) and (max-width: 991px) {
       button{

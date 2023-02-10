@@ -14,6 +14,7 @@
     "core-js": "^3.8.3",
     "instal": "^0.0.1-security",
     "node-sass": "^8.0.0",
+    "pinia": "^2.0.30",
     "vue": "^2.7.14",
     "vue-router": "3.2",
     "vuex": "3.2"

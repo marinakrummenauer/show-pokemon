@@ -14,6 +14,7 @@ Vue.use(VueRouter);
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 
+
 Vue.prototype.$http = axios;
 
 Vue.config.productionTip = false

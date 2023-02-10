@@ -1,28 +1,28 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <form @submit.prevent="searchPokemon">
+      <input type="text" v-model="pokemonName" placeholder="Pesquise aqui seu Pokémon">
+      <button type="submit">Buscar</button>
+    </form>
+    <ul v-if="pokemon">
+      <li v-for="pokemon in pokemons"  v-bind:key="pokemon.id">{{ pokemon.name }}</li>
+    </ul>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  data() {
+    return {
+      pokemonName: '',
+      pokemons: []
+    }
+  },
+  methods: {
+    async searchPokemon() {
+      const response = await this.$http.get(`https://pokeapi.co/api/v2/pokemon/${this.pokemonName}`);
+      this.pokemons = response.data;
+    }
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>

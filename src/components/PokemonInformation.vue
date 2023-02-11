@@ -27,10 +27,19 @@
               <li>Speed: <span class="info-value">{{ pokemon.stats[0].base_stat }}</span></li>
             </ul>
             </li>
-            <li>Evoluções:
-              <ul>
-                <li v-for="(evolution, index) in evolutions" v-bind:key="index">{{ evolution.toUpperCase() }}
-                  <img v-if="evolution.sprite" :src="pokemon.evolvedSprite"  alt="Evolution sprite">
+            <li>Evolução:
+              <ul class="evolution">
+                <li v-for="evolution in evolutions"  v-bind:key="evolution.id">
+                  <h2>{{ evolution.name.toUpperCase()  }}</h2>
+                  <img v-if="evolution.sprite" :src="evolution.sprite" alt="Evolution sprite"  @click="showEvolutionInfo(evolutions)" >
+                  <ul class="pokemon-info-container" v-if="evolution.showInfo">
+                    <li>HP: <span class="info-value">{{ evolution.stats[5].base_stat }} </span></li>
+                    <li>Attack: <span class="info-value">{{ evolution.stats[4].base_stat }} </span> </li>
+                    <li>Defense: <span class="info-value">{{ evolution.stats[3].base_stat }} </span></li>
+                    <li>Special Attack: <span class="info-value">{{ evolution.stats[2].base_stat }}</span></li>
+                    <li>Special Defense: <span class="info-value">{{ evolution.stats[1].base_stat }}</span></li>
+                    <li>Speed: <span class="info-value">{{ evolution.stats[0].base_stat }}</span></li>
+                  </ul>
                 </li>
               </ul>
             </li>
@@ -47,6 +56,7 @@
     data() {
       return {
         pokemonName: "",
+        evolution: "",
         pokemons: [],
         evolutions:[],
         errorMessage: "",
@@ -55,6 +65,9 @@
     created() {
       this.pokemons.forEach(pokemon => {
         pokemon.showInfo = false;
+      }),
+      this.evolutions.forEach(evolution => {
+        evolution.showInfo = false;
       })
     },
     methods: {
@@ -69,6 +82,14 @@
           this.errorMessage = "Pokémon inexistente";
         }
       },
+      async getEvolutionSprite(evolution) {
+        try {
+          const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${evolution.toLowerCase()}`);
+          return response.data.sprites.front_default;
+        } catch (error) {
+          console.error(error);
+        }
+      },
       async searchEvolutions(pokemon) {
         try {
           const response = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${pokemon.id}`);
@@ -80,7 +101,8 @@
           while (evolutionDetails.evolves_to.length) {
             const evolution = evolutionDetails.evolves_to[0];
             if (evolution.species.name !== pokemon.name) {
-              evolutions.push(evolution.species.name);
+              const sprite = await this.getEvolutionSprite(evolution.species.name);
+              evolutions.push({ name: evolution.species.name, sprite });
             }
             evolutionDetails = evolution;
           }
@@ -89,17 +111,13 @@
           console.error(error);
         }
       },
-      async getEvolutionSprite(evolution) {
-        try {
-          const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${evolution.toLowerCase()}`);
-          return response.data.sprites.front_default;
-        } catch (error) {
-          console.error(error);
-        }
-      },
       showPokemonInfo(pokemon) {
         console.log('showPokemonInfo');
         pokemon.showInfo = !pokemon.showInfo;
+      },
+      showEvolutionInfo(evolution) {
+        console.log('showEvolutionInfo');
+        evolution.showInfo = !evolution.showInfo;
       },
       clearErrorMessage() {
         this.errorMessage = "";
@@ -167,6 +185,14 @@
     }
     .alert-danger{
       margin-top:24px;
+    }
+    .evolution{
+      ul{
+        padding-left: 0 !important;
+      }
+      h2{
+        margin-right: 15px !important;
+      }
     }
     li {
       list-style-type: none;

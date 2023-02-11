@@ -17,14 +17,14 @@
         <ul v-if="pokemons.length">
           <li v-for="pokemon in pokemons"  v-bind:key="pokemon.id">
             <h2>{{ pokemon.name.toUpperCase()  }}</h2>
-            <img :src="pokemon.sprites.front_default" alt="Pokemon sprite">
-            <ul class="pokemon-info-container">
-              <li>HP: {{ pokemon.stats[5].base_stat }}</li>
-              <li>Attack: {{ pokemon.stats[4].base_stat }}</li>
-              <li>Defense: {{ pokemon.stats[3].base_stat }}</li>
-              <li>Special Attack: {{ pokemon.stats[2].base_stat }}</li>
-              <li>Special Defense: {{ pokemon.stats[1].base_stat }}</li>
-              <li>Speed: {{ pokemon.stats[0].base_stat }}</li>
+            <img :src="pokemon.sprites.front_default" alt="Pokemon sprite" @click="showPokemonInfo(pokemon)">
+            <ul class="pokemon-info-container" v-if="pokemon.showInfo">
+              <li>HP: <span class="info-value">{{ pokemon.stats[5].base_stat }} </span></li>
+              <li>Attack: <span class="info-value">{{ pokemon.stats[4].base_stat }} </span> </li>
+              <li>Defense: <span class="info-value">{{ pokemon.stats[3].base_stat }} </span></li>
+              <li>Special Attack: <span class="info-value">{{ pokemon.stats[2].base_stat }}</span></li>
+              <li>Special Defense: <span class="info-value">{{ pokemon.stats[1].base_stat }}</span></li>
+              <li>Speed: <span class="info-value">{{ pokemon.stats[0].base_stat }}</span></li>
             </ul>
           </li>
         </ul>
@@ -44,16 +44,24 @@
         errorMessage: ""
       }
     },
+    created() {
+      this.pokemons.forEach(pokemon => {
+        pokemon.showInfo = false;
+      })
+    },
     methods: {
       async searchPokemon() {
         try {
           const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${this.pokemonName.toLowerCase()}`);
-          this.pokemons = [response.data];
+          const pokemon = response.data;
+          pokemon.showInfo = false;
+          this.pokemons = [pokemon];
         } catch (error) {
           this.errorMessage = "Pokémon inexistente";
         }
       },
       showPokemonInfo(pokemon) {
+        console.log('showPokemonInfo');
         pokemon.showInfo = !pokemon.showInfo;
       },
       clearErrorMessage() {
@@ -108,6 +116,15 @@
           align-items: center;
         }
     }
+    .close{
+      margin-left: 8px;
+      font-size: 18px;
+      width: 30px;
+      height: 30px;
+      color:#842029;
+      border-color:#f5c2c7;
+      background-color: #f8d7da;;
+    }
     .pokemon-info {
       display: none;
     }
@@ -118,12 +135,17 @@
       list-style-type: none;
       padding:10px 20px;
       font-weight: 400 ;
+      color: #2e63aa;
     }
     .pokemon-info-container {
-      border: 2px solid #f1c204;
+      border: 4px solid #f1c204;
       padding: 10px;
       margin-top: 10px;
       margin-right: 20px;
+        .info-value{
+          color:#f1c204;
+          font-weight: 800;
+        }
     }
     @media (min-width: 320px ) and (max-width: 991px) {
       button{
@@ -143,6 +165,7 @@
         display: flex;
         font-size:18px;
         height:32px;
+        width:285px;
       }
       .form-container{
         margin-top:24px;
@@ -153,6 +176,9 @@
       }
       .pokemon-info-container {
         width: 280px;
+      }
+      .pokemon-results{
+        margin-right: 8px;
       }
     }
     @media (min-width: 1024px ) {

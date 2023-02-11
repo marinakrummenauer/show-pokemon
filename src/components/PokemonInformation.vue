@@ -26,7 +26,14 @@
               <li>Special Defense: <span class="info-value">{{ pokemon.stats[1].base_stat }}</span></li>
               <li>Speed: <span class="info-value">{{ pokemon.stats[0].base_stat }}</span></li>
             </ul>
-          </li>
+            </li>
+            <li>Evoluções:
+              <ul>
+                <li v-for="(evolution, index) in evolutions" v-bind:key="index">{{ evolution.toUpperCase() }}
+                  <img v-if="evolution.sprite" :src="pokemon.evolvedSprite"  alt="Evolution sprite">
+                </li>
+              </ul>
+            </li>
         </ul>
       </div>
       </div>
@@ -41,7 +48,8 @@
       return {
         pokemonName: "",
         pokemons: [],
-        errorMessage: ""
+        evolutions:[],
+        errorMessage: "",
       }
     },
     created() {
@@ -56,8 +64,37 @@
           const pokemon = response.data;
           pokemon.showInfo = false;
           this.pokemons = [pokemon];
+          await this.searchEvolutions(pokemon);
         } catch (error) {
           this.errorMessage = "Pokémon inexistente";
+        }
+      },
+      async searchEvolutions(pokemon) {
+        try {
+          const response = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${pokemon.id}`);
+          const pokemonSpecies = response.data;
+          const evolutionChainResponse = await axios.get(pokemonSpecies.evolution_chain.url);
+          const evolutionChain = evolutionChainResponse.data;
+          const evolutions = [];
+          let evolutionDetails = evolutionChain.chain;
+          while (evolutionDetails.evolves_to.length) {
+            const evolution = evolutionDetails.evolves_to[0];
+            if (evolution.species.name !== pokemon.name) {
+              evolutions.push(evolution.species.name);
+            }
+            evolutionDetails = evolution;
+          }
+          this.evolutions = evolutions;
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      async getEvolutionSprite(evolution) {
+        try {
+          const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${evolution.toLowerCase()}`);
+          return response.data.sprites.front_default;
+        } catch (error) {
+          console.error(error);
         }
       },
       showPokemonInfo(pokemon) {
